@@ -21,7 +21,8 @@ class MainApp {
                 }
                 text {
                     val result = text
-                        .log(message.from?.username.orEmpty())
+                        .log(message.from?.username.orEmpty(), message.from?.id)
+                        .clearify()
                         .checkPhone {
                             bot.send(message.from.getErrorMessage(it), message.chat.id)
                         }
@@ -62,9 +63,14 @@ class MainApp {
         }.trimIndent()
     }
 
-    private fun String.log(name: String): String {
-        if (this.isNotEmpty()) println("message $this from $name")
+    private fun String.log(name: String, id: Long?): String {
+        if (this.isNotEmpty()) println("message $this from $name with id $id")
         return this
+    }
+
+    private fun String.clearify(): String {
+        val reg = "^(\\+)|[^\\d\\n]".toRegex()
+        return this.replace(reg, "")
     }
 
     private fun Bot.send(text: String, id: Long) {
