@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.tomindapps"
-version = "1.0-SNAPSHOT"
+version = "0.1"
 
 dependencies {
     implementation(project(":main_app"))
