@@ -8,13 +8,21 @@ import com.github.kotlintelegrambot.dispatcher.text
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.entities.User
+import kotlinx.datetime.Clock
 import java.util.regex.Pattern
 
 class MainApp {
 
+    private val botToken = System.getenv("WDT")
+
     fun start() {
+        System.getenv().forEach {
+            println("${it.key} : ${it.value}")
+        }
+
+        println("Starting bot with token - $botToken")
         val bot = bot {
-            token = "5821512388:AAGtX3TNAwu7QuN_pc9hx915IgILAW8soVc"
+            token = botToken
             dispatch {
                 command("start") {
                     bot.send(message.from.getGreetingMessage(), update.message!!.chat.id)
@@ -37,6 +45,7 @@ class MainApp {
             }
         }
         bot.startPolling()
+        println("Bot started")
     }
 
     private fun User?.getGreetingMessage(): String {
@@ -49,9 +58,17 @@ class MainApp {
 
     private fun User?.getErrorMessage(text: String): String {
         return if (this?.languageCode?.contains("ru", true) == true) {
-            ERROR_RU_1 + text + ERROR_RU_2
+            if (text.isNotEmpty()) {
+                ERROR_RU_1 + text + ERROR_RU_2
+            } else {
+                ERROR_RU_3
+            }
         } else {
-            ERROR_EN_1 + text + ERROR_EN_2
+            if (text.isNotEmpty()) {
+                ERROR_EN_1 + text + ERROR_EN_2
+            } else {
+                ERROR_EN_3
+            }
         }.trimIndent()
     }
 
@@ -64,7 +81,8 @@ class MainApp {
     }
 
     private fun String.log(name: String, id: Long?): String {
-        if (this.isNotEmpty()) println("message $this from $name with id $id")
+        val time = Clock.System.now().toString()
+        if (this.isNotEmpty()) println("$time: message $this from $name with id $id")
         return this
     }
 
@@ -111,8 +129,10 @@ class MainApp {
         private const val FRIEND_EN = "Here's a direct link, friend!"
         private const val ERROR_RU_1 = "Не удалось правильно определить номер телефона - \"*"
         private const val ERROR_RU_2 = "*\", попробуй ещё раз:)"
+        private const val ERROR_RU_3 = "Не удалось правильно определить номер телефона, попробуй ещё раз:)"
         private const val ERROR_EN_1 = "Unable to determine the correct phone number - \"*"
         private const val ERROR_EN_2 = "*\", try it again please:) "
+        private const val ERROR_EN_3 = "Unable to determine the correct phone number, try it again please:)"
         private const val GREETING_RU = """
             Привет! Я чат-бот и помогу тебе открыть чат WhatsApp не сохраня контакт в книгу контактов! 
             Просто отправь мне номер в международном формате или начиная с "8"!
