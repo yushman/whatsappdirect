@@ -27,6 +27,9 @@ jobs:
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'adopt' # See 'Supported distributions' for available options
+          java-version: '11'
 
       - name: Gradle Build Action
         uses: gradle/gradle-build-action@v3.5.0
